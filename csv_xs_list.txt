@@ -1,0 +1,32 @@
+&csv_file_list
+    ! list array of csv file strings needed
+    xs_dat_list = ( 'U238_1200K_total.dat',     & ! U238
+                    'U238_1200K_elastic.dat',   &
+                    'U238_1200K_inelastic.dat', &
+                    'U238_1200K_fission.dat',   &
+                    'U238_1200K_capture.dat',   &
+                    'U238_1200K_nubar.dat',     &
+                    'U235_1200K_total.dat',     & ! U235
+                    'U235_1200K_elastic.dat',   &
+                    'U235_1200K_inelastic.dat', &
+                    'U235_1200K_fission.dat',   &
+                    'U235_1200K_capture.dat',   &
+                    'U235_1200K_nubar.dat',     &
+                    'C12_1200K_total.dat',      & ! C12
+                    'C12_1200K_elastic.dat',    &
+                    'C12_1200K_capture.dat',    &
+                    'O16_1200K_total.dat',      & ! O16
+                    'O16_1200K_elastic.dat',    &
+                    'O16_1200K_capture.dat',    &
+                    'Si28_1200K_total.dat',     & ! Si28
+                    'Si28_1200K_elastic.dat',   &
+                    'Si28_1200K_capture.dat',   &
+                    'Si29_1200K_total.dat',     & ! Si29
+                    'Si29_1200K_elastic.dat',   &
+                    'Si29_1200K_capture.dat',   &
+                    'Si30_1200K_total.dat',     & ! Si30
+                    'Si30_1200K_elastic.dat',   &
+                    'Si30_1200K_capture.dat'    )
+
+    /
+    

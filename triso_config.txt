@@ -1,0 +1,44 @@
+&triso_config
+    ! what if i make something that shuffles these radii around to optimize for something?
+    ! at some point dynamically build the fission bank based off number of neutrons
+    ! required cross section datas, U235, U238, C12, O16, Si28, Si29, Si30
+    ! for all these we need data for MT=1,2,18,102
+    ! MT=1 : total cross section
+    ! MT=2 : elastic scattering
+    ! MT=18 : total fissions, only requred for uranium
+    ! MT=102 : radiative capture
+    ! ****************************************************************
+    ! Universal Configuration settings
+    ! ****************************************************************
+    num_neutrons = 1e4
+    num_generations = 50
+    ! hash map can be tuned for the CPU/GPU
+    ! the target is in MB, match this to the L2 cache of the machine
+    ! M4 mac is about 16 to 32 MB
+    ! RTX3080 is about 5 MB
+    ! H100 is about 50MB PCIe and 60MB SXM
+    memory_target_mb = 5
+    ! a bitwise hash map of the E grid will be assembled, each bucket
+    ! will have the specified number of bytes in it
+    ! smaller will run faster but take up more total storage
+    bytes_per_bucket = 8
+    ! ****************************************************************
+    ! TRISO pellet dimentions
+    ! ****************************************************************
+    kernel_radius =
+    buffer_radius =
+    inner_pyc_radius =
+    sic_radius =
+    outer_pyc_radius =
+    ! ****************************************************************
+    ! Material data and % enrichment
+    ! ****************************************************************
+    ! enrichment fraction is atomic
+    ! rho for materials is in g/cm^3
+    enrichment_fraction = 0.1975
+    rho_uo2 =
+    rho_buffer =
+    rho_pyc =
+    rho_sic =
+
+    /

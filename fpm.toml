@@ -1,0 +1,9 @@
+name = "triso_sim"
+version = "0.1.0"
+license = ""
+author = "Aidan Meyers"
+maintainer = "aidan_meyers@outlook.com"
+copyright = ""
+
+[dependencies]
+philox = { git = "https://github.com/RJaBi/Philox_Fortran.git" }

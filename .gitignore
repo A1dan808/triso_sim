@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# fpm build output
+build/
+
+# XS data folder: ignore everything except the extracted .dat files
+xs_data/1200K
