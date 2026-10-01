@@ -10,7 +10,7 @@ module neutron_math
 
     private
     public :: populate_alpha, gather_pathlengths, spawn_neutrons, &
-                  event_sampling
+              event_sampling
 
     ! module paraeters
     ! philox cbrng key
@@ -30,9 +30,10 @@ module neutron_math
     real(sp),    parameter :: energy_threshold = 1.0_sp
 
     ! for event sampling
-    integer(ip), parameter :: scatter = 1_ip
-    integer(ip), parameter :: capture = 2_ip
-    integer(ip), parameter :: fission = 3_ip
+    integer(ip), parameter :: elastic_scatter = 1_ip
+    integer(ip), parameter :: inelastic_scatter = 2_ip
+    integer(ip), parameter :: capture = 3_ip
+    integer(ip), parameter :: fission = 4_ip
  
     contains
 
@@ -57,6 +58,24 @@ module neutron_math
         alpha(3) = ((a(3) - 1.0_sp) / (a(3) + 1.0_sp)) ** 2
     end subroutine populate_alpha
 
+    pure subroutine scatter_neutrons(neutrons, tracking, randoms)
+        ! in
+        real(dp),             intent(in)     :: randoms(:)
+        ! in out
+        type(neutron_state),  intent(in out) :: neutrons
+        type(tracking_state), intent(in out) :: tracking
+        ! local
+        integer(ip) :: i
+        real(dp)    :: mu_cm, mu_lab
+        ! what will I do with my alpha? 
+        
+        ! omp flag will go here
+        do i = 1_ip, size(neutrons%energy)
+            tracking%
+        end do
+        
+    end subroutine scatter_neutrons
+
     pure subroutine gather_pathlengths(neutrons, tracking, randoms)
         ! in
         real(dp),             intent(in)     :: randoms(:)
@@ -67,7 +86,8 @@ module neutron_math
         integer(id)           :: counter(4)
     
         ! the memory for randoms here will be allocated with the size of the
-        ! group of neutrons
+        ! group of neutrons, perhaps when the neutrons split into different
+        ! events I might split randoms, or maybe just slice it.
 
         call philox_fill_uniform_oo(counter, key,    1_id,  &
                                     0.0_dp,  1.0_dp, randoms)
@@ -121,10 +141,6 @@ module neutron_math
                                 isotope,    neutrons%energy(i)      )
         end do
     end subroutine spawn_neutrons
-
-    pure subroutine event_sampling
-        ! sampling events will be written later. 
-    end subroutine event_sampling
-
+  
 end module neutron_math
 

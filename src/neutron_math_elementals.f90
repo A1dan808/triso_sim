@@ -13,12 +13,12 @@ elemental subroutine initial_position(random_1, random_2, random_3, &
         ! in out
         real(dp), intent(in out) :: x, y, z
         ! local
-        real(sp)                 :: r, cos_theta, sin_theta, phi
+        real(dp)                 :: r, cos_theta, sin_theta, phi
                 
         r = radius * cbrt(random_1)
 
-        cos_theta = 2.0_sp * random_2 - 1.0_dp
-        sin_theta = sqrt(1.0_sp - cos_theta ** 2_ip)
+        cos_theta = 2.0_dp * random_2 - 1.0_dp
+        sin_theta = sqrt(1.0_dp - cos_theta ** 2_ip) ! make safer?
 
         phi = 2.0_sp * pi * random_3
 
@@ -112,13 +112,14 @@ elemental subroutine initial_position(random_1, random_2, random_3, &
         end if
     end function new_weight
     
-    elemental function elastic_energy(old_energy, alpha, random) &
-                       result(new_energy)
+    elemental subroutine elastic_kinematics(energy, random, a, alpha, mu_lab)
+        ! incomplete, will be reworked stopping here for time being.
         ! in
-        real(dp), intent(in) :: random
-        real(sp), intent(in) :: old_energy, alpha
-        ! result
-        real(sp)             :: new_energy
+        integer(ip), intent(in) :: a
+        real(dp),    intent(in) :: random
+        real(sp),    intent(in) :: alpha
+        ! in out
+        real(sp), intent(in out) :: energy
         ! local
         real(sp) :: cos_mew_cm
 
@@ -126,15 +127,7 @@ elemental subroutine initial_position(random_1, random_2, random_3, &
 
         new_energy = 0.5_sp * old_energy                             &
                    * ((1.0_sp - alpha) *  cos_mew_cm + 1.0_sp + alpha)
-    end function elastic_energy
-
-    elemental subroutine elastic_angle(u, v, w, new_energy)
-        ! in
-        real(sp), intent(in)     :: new_energy
-        ! in out
-        real(dp), intent(in out) :: u, v, w
-
-    end subroutine elastic_angle
+    end subroutine elastic_kinematics
     
     elemental function fission_births(nu_bar, random) result(number_births)
         ! will return an integer amount of neutrons to spawn from fission
@@ -164,33 +157,100 @@ elemental subroutine initial_position(random_1, random_2, random_3, &
         end if
     end function fission_births
     
-    elemental function event_cdf(random_1, random_2, macro_total, &
-                                 macro_scatter, macro_capture,    &
-                                 macro_fission)       result(event)
+    elemental function event_cdf(random, macro_total, macro_inelastic, &
+                                 macro_elastic, macro_capture,         &
+                                 macro_fission)            result(event)
         ! in
-        real(dp),           intent(in) :: random_1, random_2
+        real(dp),           intent(in) :: random
         real(sp),           intent(in) :: macro_total
-        real(sp),           intent(in) :: macro_scatter
+        real(sp),           intent(in) :: macro_elastic
+        real(sp),           intent(in) :: macro_inelastic
         real(sp),           intent(in) :: macro_capture
         real(sp), optional, intent(in) :: macro_fission
         ! result
         integer(ip) :: event
         ! local
-        real(sp) :: scaled_random
+        real(sp) :: scaled_random, cumulative_xs
 
         scaled_random = real(random, sp) * macro_total
+        
+        ! now with faster flat CDF
+        ! check elastic
+        cumulative_xs = macro_elastic
+        if (scaled_random < cumulative_xs) then
+            event = elastic_scatter
+            return
+        end if
 
-        if (scaled_random < macro_scatter) then
-            event = scatter
-        else if (present(macro_fission)) then
-            if (scaled_random < (macro_scatter + macro_capture)) then
-                event = capture
-            else
+        ! check inelastic
+        cumulative_xs = cumulative_xs + macro_inelastic
+        if (scaled_random < cumulative_xs) then
+            event = inelastic_scatter
+            return
+        end if
+
+        ! check capture
+        cumulative_xs = cumulative_xs + macro_capture
+        if (scaled_random < cumulative_xs) then
+            event = capture
+            return
+        end if
+
+        ! check fission if applicable
+        if (present(macro_fission)) then
+            cumulative_xs = cumulative_xs + macro_fission
+            if (scaled_random < cumulative_xs) then
                 event = fission
             end if
-        else
-            event = capture
         end if
+
     end function event_cdf
+
+    elemental subroutine scatter_direction(u, v, w, mu_lab, random)
+        ! in
+        real(dp), intent(in)     :: random
+        real(dp), intent(in)     :: mu_lab
+        ! in out
+        real(dp), intent(in out) :: u, v, w
+        ! local, temps to reduce cycles
+        real(dp) :: phi, mu_sqrt, w_sqrt, cos_phi, sin_phi, norm
+        
+        ! sample azimuthal angle (0,2pi)
+        phi = random * 2.0_dp * pi
+
+        ! calculate and map temps (safe square roots)
+        w_sqrt  = sqrt(max(0.0_dp, 1.0_dp - w**2_ip))
+        mu_sqrt = sqrt(max(0.0_dp, 1.0_dp - mu_lab**2_ip))
+        sin_phi = sin(phi)
+        cos_phi = cos(phi)
+
+        ! neutron is not on the z axis
+        if (abs(w) < 0.999999_dp) then
+            
+            u = u*mu_lab + (mu_sqrt * (u*w*cos_phi - v*sin_phi)) &
+              / w_sqrt
+
+            v = v*mu_lab + (mu_sqrt * (v*w*cos_phi + u*sin_phi)) &
+              / w_sqrt
+            
+            w = w*mu_lab - mu_sqrt * w_sqrt * cos_phi
+
+        else ! neutron is on the z axis
+            
+            u = mu_sqrt * cos_phi
+
+            v = mu_sqrt * sin_phi
+
+            w = sign(1.0_dp, w) * mu_lab
+
+        end if
+
+        ! re normalize direction vector to prevent drift, optimize later
+        norm = 1.0_dp / sqrt(u**2_ip + v**2_ip + w**2_ip)
+        u = u * norm
+        v = v * norm
+        w = w * norm
+
+    end subroutine scatter_direction
 
 end submodule neutron_math_elementals
