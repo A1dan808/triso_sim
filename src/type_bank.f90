@@ -24,6 +24,8 @@ module type_bank
         ! geometry identifiers
         integer(ip), allocatable :: region_id(:)
         integer(ip), allocatable :: material_id(:)
+        ! event identifier
+        integer(ip), allocatable :: event(:)
         ! sampled value arrays
         real(sp),    allocatable :: current_macro_total(:)
         real(sp),    allocatable :: current_pathlength(:)

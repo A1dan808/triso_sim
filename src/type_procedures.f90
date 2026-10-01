@@ -37,6 +37,7 @@ submodule (type_bank) type_procedures
 
         allocate(self%region_id(n), source=0_ip)
         allocate(self%material_id(n), source=0_ip)
+        allocate(self%event(n), source=0_ip)
         allocate(self%current_macro_total(n), source=0.0_sp)
         allocate(self%current_pathlength(n), source=0.0_sp)
     end procedure initialize_tracking
@@ -44,6 +45,7 @@ submodule (type_bank) type_procedures
     module procedure free_tracking
         if (allocated(self%region_id)) deallocate(self%region_id)
         if (allocated(self%material_id)) deallocate(self%material_id)
+        if (allocated(self%event)) deallocate(self%event)
         if (allocated(self%current_macro_total)) &
             deallocate(self%current_macro_total)
         if (allocated(self%current_pathlength)) &
