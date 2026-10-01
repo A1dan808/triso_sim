@@ -8,27 +8,27 @@ built are notated as such with comments in the files.
 
 # Final Objectives
 
-- parallel on an M4 macbook with gpu acceloration based on the apple metal engine
-- parallel on an windows pc with a i7 and RTX3080 with NVIDIA RTX acceloration
+- parallel on a M4 macbook with gpu acceleration based on the apple metal engine
+- parallel on a windows pc with an i7 and RTX3080 with NVIDIA RTX acceleration
 
 # Repository Structure
 
-- 'src/'  - All modules containing types, subroutines, and functions.
-- 'app/'  - Where the main programs are located, they handle file names and some io
-- 'test/' - Test script programs, usually testing statistical accuracy of for debugging
+- `src/`  - All modules containing types, subroutines, and functions.
+- `app/`  - Where the main programs are located, they handle file names and some io
+- `test/` - Test script programs, checking statistical accuracy or debugging
 
 # Build
 
-- Rrequires a fortran compiler, I'm using gfortran on the macbook. I will use an NVIDIA 
-based compiler for the RTX3080. Only requirment is free source form because of the ISO C
+- Requires a Fortran compiler, I'm using gfortran on the macbook. I will use an NVIDIA 
+based compiler for the RTX3080. Only requirement is free-form source because of the ISO C
 Binding use.
 
 - To build with fpm installed simply bash
-'''bash
+```bash
 fpm build
-'''
+```
 
-## Dependencies 
+# Dependencies 
 
 - [Philox_Fortran](https://github.com/RJaBi/Philox_Fortran) (MIT)
 - Read THIRDPARTY_LICENSES.txt for more info
